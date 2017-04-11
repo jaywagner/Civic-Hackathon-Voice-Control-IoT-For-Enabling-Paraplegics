@@ -6,7 +6,7 @@ It also requires to set up the Google account with specific authority. You need 
 
 Go to Google API Manger
 
->> Credentials
+under Credentials
 
 Specify a name: Web client
 
