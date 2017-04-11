@@ -1,8 +1,8 @@
-To run the node component. For testing purposes you need to 
+First you need to do:
 
-node mail.js
+npm install
 
-It also requires to set up the Google account with specific authority. You need 'client_id' and 'client_secret' and then add to secret.json
+This component requires to set up the Google account with specific authority. You need 'client_id' and 'client_secret' and then add to secret.json
 
 Go to Google API Manger -> Credentials
 
@@ -19,4 +19,9 @@ Then you need to enable services from Dashboard the following:
 
 1. Google People API
 2. Gmail API
+
+
+To run the node component. For testing purposes you need to 
+
+node mail.js
 
