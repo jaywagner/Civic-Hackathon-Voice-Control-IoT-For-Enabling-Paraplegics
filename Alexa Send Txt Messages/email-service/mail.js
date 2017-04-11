@@ -27,6 +27,11 @@ const people = google.people({
   auth: auth
 });
 
+const gmail = google.gmail({
+  version: 'v1',
+  auth: auth
+});
+
 // function me(tokens) {
 //   people.people.get({
 //     'resourceName': 'people/me',
@@ -74,34 +79,76 @@ function list(tokens) {
       });
     });
 
-//Look up a person
-lookupEmail('Jay');
-    process.exit();
+  //Look up a person >>>>> Need to populate a name to get a email address.
+  lookupEmail('xxx');
+  process.exit();
   });
 }
 
 //A function to look up a person
 function  lookupEmail(name) {
     var result = contactdb.find({ 'name': { '$contains': name.toLowerCase() } });
+    var emailAddress = null;
     //console.log('results = ' + result.length);
     if (result.length > 1) {
       console.log('More than one name returned');
     } else if (result.length > 0) {
       console.log(result[0].email);
+      emailAddress = result[0].email;
     } else {
       console.log('Not found');
     }
+    console.log(emailAddress);
+    return emailAddress;
 }
+
+function sendMail(tokens, emailAddress) {
+
+    var email_lines = [];
+
+    email_lines.push('From: "test" <jay.wagner@gmail.com>');
+    //console.log(emailAddress);
+;   email_lines.push('To: jay.wagner@gmail.com');
+    email_lines.push('Content-type: text/html;charset=iso-8859-1');
+    email_lines.push('MIME-Version: 1.0');
+    email_lines.push('Hello World');
+    email_lines.push('');
+    email_lines.push('And this would be the content.<br/>');
+    email_lines.push('The body is in HTML so <b>we could even use bold</b>');
+
+    var email = email_lines.join('\r\n').trim();
+
+    var base64EncodedEmail = new Buffer(email).toString('base64');
+    base64EncodedEmail = base64EncodedEmail.replace(/\+/g, '-').replace(/\//g, '_');
+
+    gmail.users.messages.send({
+      auth: auth,
+      userId: 'me',
+      resource: {
+        raw: base64EncodedEmail
+      }
+    }, function (err, me) {
+    if (err) {
+      console.error(err);
+      process.exit();
+      return;
+    }
+  });
+  }
 
 const scopes = [
   'https://www.googleapis.com/auth/plus.login',
   'https://www.googleapis.com/auth/contacts.readonly',
-  'https://www.googleapis.com/auth/user.emails.read'
+  'https://www.googleapis.com/auth/user.emails.read',
+  'https://www.googleapis.com/auth/gmail.send'
 ];
 
 if (module === require.main) {
   client.execute(scopes, function (tokens) {
     //me(tokens);
-    list(tokens);
+    var emailAddress = list(tokens);
+    if (emailAddress !== null) {
+      sendMail(tokens, emailAddress);
+    }
   });
 }
